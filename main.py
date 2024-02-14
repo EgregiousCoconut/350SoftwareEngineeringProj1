@@ -108,8 +108,24 @@ the game.
 '''
 
 
+class UsernameMaxException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
 class user(horse, scoreTrack):
-    pass
+    def __init__(self, name):
+        self.__name = name  # name user inputs
 
+    @property
+    def name(self):
+        return self.__name
 
-"""Did this work???"""
+    @name.setter
+    def name(self, name):
+        if len(name) > 20:
+            raise UsernameMaxException("Username is limited to 20 characters.")
+        self.__name = name
+
+    def print_info(self):
+        return "User: " + str(self.name)
+
