@@ -1,3 +1,7 @@
+import pygame, sys
+import os
+from pygame.locals import *
+
 '''
 The class that will hold our data  for our graphics, including: title screen,
 basketball rim, and our basketball release slider (hold down a button and release
@@ -6,7 +10,40 @@ at certain point on the slider).
 
 
 class graphics():
-    pass
+    width = 960
+    height = 540
+
+    pygame.init()
+    windowSurfaceObj = pygame.display.set_mode((width, height), 1, 16)
+    greenColor = pygame.Color(0, 255, 0)
+    blackColor = pygame.Color(0, 0, 0)
+
+    x = 100
+    pygame.draw.rect(windowSurfaceObj, greenColor, Rect(x, 5, 10, height - 10))
+    pygame.display.update(pygame.Rect(0, 0, width, height))
+
+    s = 0
+    while s == 0:
+        button = pygame.mouse.get_pressed()
+        if button[0] != 0:
+            pos = pygame.mouse.get_pos()
+            x = pos[0]
+            y = pos[1]
+            a = x - 5
+            if a < 0:
+                a = 0
+            pygame.draw.rect(windowSurfaceObj, blackColor, Rect(0, 0, width, height))
+            pygame.draw.rect(windowSurfaceObj, greenColor, Rect(a, 5, 10, height - 10))
+            pygame.display.update(pygame.Rect(0, 0, width, height))
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
 
 
 '''
@@ -59,6 +96,10 @@ class scoreTrack():
             return self.__name  # return name instead of True, so we can know who won
         else:
             return False
+
+    @property
+    def name(self):
+        return self.__name
 
 
 '''
