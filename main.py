@@ -1,3 +1,5 @@
+import time
+
 import pygame, sys
 import os
 from pygame.locals import *
@@ -15,12 +17,23 @@ class graphics():
         self.width = 960
         self.height = 540
         pygame.init()
+        pygame.font.init()
         self.windowSurfaceObj = pygame.display.set_mode((self.width, self.height), 1, 16)
         self.greenColor = pygame.Color(0, 255, 0)
         self.blackColor = pygame.Color(0, 0, 0)
-        self.x = 100
-        pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.x, 5, 10, self.height - 10))
+        self.whiteColor = pygame.Color(255, 255, 255)
+        self.a = 100
+        self.b = 10
+        pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.width / 4, self.a, self.width / 2, 10))
         pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
+
+    def draw_text(self, text, position, font_size=24, color = None):
+        if color is None:
+            color = self.whiteColor
+        font = pygame.font.Font(None, font_size)  # Use the default font and specified size
+        text_surface = font.render(text, True, color)  # Create a text surface
+        self.windowSurfaceObj.blit(text_surface, position)  # Draw the text surface to the screen
+        pygame.display.update()
 
     def run(self):
         running = True
@@ -33,16 +46,26 @@ class graphics():
                         running = False
 
             self.button = pygame.mouse.get_pressed()
+            time.sleep(.03)
+            self.a += self.b
+            if self.a < 0:
+                self.a = 0
+                self.b *= -1
+            elif self.a > self.height:
+                self.a = self.height
+                self.b *= -1
+            pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
+            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, self.a, self.width / 2, 10))
+            pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
             if self.button[0] != 0:
-                self.pos = pygame.mouse.get_pos()
-                self.x = self.pos[0]
-                self.y = self.pos[1]
-                self.a = self.x - 5
-                if self.a < 0:
-                    self.a = 0
                 pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
-                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.a, 5, 10, self.height - 10))
+                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, self.a, self.width / 2, 10))
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
+                self.b = 0
+
+            self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
+            self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
+            self.draw_text(winner_text, (425, 250), 35)
 
         pygame.quit()
         sys.exit()
@@ -189,6 +212,8 @@ if __name__ == "__main__":
                     print(f"{player2.name} has lost the game.")
                     break
 
+    game_graphics = graphics()
+
     p1_letters = len(player1.score_tracker.letters)
     p2_letters = len(player2.score_tracker.letters)
 
@@ -196,12 +221,20 @@ if __name__ == "__main__":
     print(player1.print_info())
     print(player2.print_info())
 
+    winner_text = ""
     if p1_letters < p2_letters:
         print(f"{player1.name} wins!")
+        winner_text = f"{player1.name} wins!"
     elif p2_letters < p1_letters:
         print(f"{player2.name} wins!")
+        winner_text = f"{player2.name} wins!"
     else:
         print("It's a draw!")
+        winner_text = "It's a Draw"
+
+    game_graphics.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490))
+    game_graphics.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490))
+    game_graphics.draw_text(winner_text, (425, 250))
 
     game_graphics = graphics()
     game_graphics.run()
