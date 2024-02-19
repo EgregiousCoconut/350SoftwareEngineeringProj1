@@ -1,3 +1,5 @@
+import time
+
 import pygame, sys
 import os
 from pygame.locals import *
@@ -10,45 +12,58 @@ at certain point on the slider).
 
 
 class graphics():
+    """had to adjust because it was running an infinite loop and I needed to test the scoring"""
+    def __init__(self):
+        self.width = 960
+        self.height = 540
+        pygame.init()
+        self.windowSurfaceObj = pygame.display.set_mode((self.width, self.height), 1, 16)
+        self.whiteColor = pygame.Color(255, 255, 255)
+        self.greenColor = pygame.Color(0, 255, 0)
+        self.blackColor = pygame.Color(0, 0, 0)
+        self.a = 100
+        self.b = 10
+        pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width / 4, self.a, self.width / 2, 10))
+        pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
 
-    width = 960
-    height = 540
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    running = False
+                elif event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        running = False
 
-    pygame.init()
-    windowSurfaceObj = pygame.display.set_mode((width, height), 1, 16)
-    greenColor = pygame.Color(0, 255, 0)
-    blackColor = pygame.Color(0, 0, 0)
+            self.button = pygame.mouse.get_pressed()
+            time.sleep(.03)
+            self.a += self.b
+            if self.a < 0:
+                self.a = 0
+                self.b *= -1
+            elif self.a > self.height:
+                self.a = self.height
+                self.b *= -1
+            pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
+            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, 50, self.width / 2, 200))
+            pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(5, self.a, self.width / 2, 10))
+            pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
+            if self.button[0] != 0:
+                pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
+                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, 50, self.width / 2, 200))
+                pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(5, self.a, self.width / 2, 10))
+                pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
+                self.b = 0
+                if self.a > 50 and self.a < 250:
+                    print("True")
+                    return True
+                else:
+                    print("False")
+                    return False
 
-    x = 100
-    y = 100
-    pygame.draw.rect(windowSurfaceObj, greenColor, Rect(width / 3, 10, width / 2, 10))
-    pygame.display.update(pygame.Rect(0, 0, width, height))
-
-    s = 0
-    a = y - 5
-    b = 2
-    while s == 0:
-        button = pygame.mouse.get_pressed()
-        a -= b
-        if a <= 0:
-            a = 5
-            b *= -1
-        elif a > height - 5:
-            a = height - 5
-            b *= -1
-        pygame.draw.rect(windowSurfaceObj, blackColor, Rect(0, 0, width, height))
-        pygame.draw.rect(windowSurfaceObj, greenColor, Rect(width / 3, a, width / 2, 10))
-        pygame.display.update(pygame.Rect(0, 0, width, height))
-        if button[0] != 0:
-            pygame.draw.rect(windowSurfaceObj, blackColor, Rect(0, 0, width, height))
-            pygame.draw.rect(windowSurfaceObj, greenColor, Rect(width / 3, a, width / 2, 10))
-            pygame.display.update(pygame.Rect(0, 0, width, height))
-            b = 0
-
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+        pygame.quit()
+        sys.exit()
 
 
 '''
@@ -82,29 +97,58 @@ that adds a letter to the HORSE scoreboard based on if a shot was made for that 
 class scoreTrack():
 
     def __init__(self, name):
-        self.__score = 0  # score per player
+        self.__letters = ""  # Stores letters for horse
         self.__name = name  # used to return name of who wins
 
-    @property
-    def score(self):
-        return self.__score
-
-    @score.setter
-    def score(self, madeCondition):
-        if madeCondition:
-            self.__score += 1  # checks if condition passed is true, if so, increment by one
-            if self.checkCondition() != False:
-                pass  # call game condition to let it know someone has passed the point threshold and has won, along with the name
+    def add_letter(self, letter):
+        self.__letters += letter
+        if self.checkCondition():
+            return True
+        return False
 
     def checkCondition(self):
-        if self.__score > 4:
-            return self.__name  # return name instead of True, so we can know who won
-        else:
-            return False
+        """check if player spelled horse"""
+        return self.__letters.startswith("HORSE")
+
+    @property
+    def letters(self):
+        return self.__letters
 
     @property
     def name(self):
         return self.__name
+
+    def __str__(self):
+        """returns current status of players HORSE letters"""
+        if not self.__letters:
+            return f"{self.__name} has no letters yet"
+        return f"{self.__name} has the letters: {self.__letters}"
+
+class users:
+    def __init__(self, name):
+        self.__name = name # name user inputs
+        self.score_tracker = scoreTrack(name) # initializes score tracker
+
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, name):
+        if len(name) > 20:
+            raise UsernameMaxException("Username is limited to 20 characters.")
+        self.__name = name
+
+    def print_info(self):
+        return f"{str(self.name)} spelled: {self.score_tracker.letters}"
+
+    def add_letter(self, letter):
+        """Add letter to players score and check if lost"""
+        lost = self.score_tracker.add_letter(letter)
+        if lost:
+            print(f"{self.__name} has spelled HORSE and lost the game!")
+            return True
+        return False
 
 
 '''
@@ -133,3 +177,49 @@ class user(horse, scoreTrack):
 
     def print_info(self):
         return "User: " + str(self.name)
+
+
+
+if __name__ == "__main__":
+    print("Testing block is executing")
+
+    player1 = users("Alice")
+    player2 = users("Bob")
+
+    shots_taken = [("Alice", True), ("Bob", False), ("Alice", False), ("Bob", True), ("Alice", False), ("Bob", False), ("Alice", False), ("Bob", False), ("Alice", False), ("Bob", False), ("Alice", True), ("Bob", False)]
+
+    for player_name, shot_made in shots_taken:
+        if player_name == player1.name:
+            if not shot_made:
+                letter = "HORSE"[len(player1.score_tracker.letters)]
+                lost = player1.add_letter(letter)
+                print(player1.print_info())
+                if lost:
+                    print(f"{player1.name} has lost the game.")
+                    break
+
+        elif player_name == player2.name:
+            if not shot_made:
+                letter = "HORSE"[len(player2.score_tracker.letters)]
+                lost = player2.add_letter(letter)
+                print(player2.print_info())
+                if lost:
+                    print(f"{player2.name} has lost the game.")
+                    break
+
+    p1_letters = len(player1.score_tracker.letters)
+    p2_letters = len(player2.score_tracker.letters)
+
+    print("\nFinal Scores:")
+    print(player1.print_info())
+    print(player2.print_info())
+
+    if p1_letters < p2_letters:
+        print(f"{player1.name} wins!")
+    elif p2_letters < p1_letters:
+        print(f"{player2.name} wins!")
+    else:
+        print("It's a draw!")
+
+    game_graphics = graphics()
+    game_graphics.run()
