@@ -10,6 +10,7 @@ at certain point on the slider).
 
 
 class graphics():
+
     width = 960
     height = 540
 
@@ -19,31 +20,35 @@ class graphics():
     blackColor = pygame.Color(0, 0, 0)
 
     x = 100
-    pygame.draw.rect(windowSurfaceObj, greenColor, Rect(x, 5, 10, height - 10))
+    y = 100
+    pygame.draw.rect(windowSurfaceObj, greenColor, Rect(width / 3, 10, width / 2, 10))
     pygame.display.update(pygame.Rect(0, 0, width, height))
 
     s = 0
+    a = y - 5
+    b = 2
     while s == 0:
         button = pygame.mouse.get_pressed()
+        a -= b
+        if a <= 0:
+            a = 5
+            b *= -1
+        elif a > height - 5:
+            a = height - 5
+            b *= -1
+        pygame.draw.rect(windowSurfaceObj, blackColor, Rect(0, 0, width, height))
+        pygame.draw.rect(windowSurfaceObj, greenColor, Rect(width / 3, a, width / 2, 10))
+        pygame.display.update(pygame.Rect(0, 0, width, height))
         if button[0] != 0:
-            pos = pygame.mouse.get_pos()
-            x = pos[0]
-            y = pos[1]
-            a = x - 5
-            if a < 0:
-                a = 0
             pygame.draw.rect(windowSurfaceObj, blackColor, Rect(0, 0, width, height))
-            pygame.draw.rect(windowSurfaceObj, greenColor, Rect(a, 5, 10, height - 10))
+            pygame.draw.rect(windowSurfaceObj, greenColor, Rect(width / 3, a, width / 2, 10))
             pygame.display.update(pygame.Rect(0, 0, width, height))
+            b = 0
 
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
 
 
 '''
@@ -128,4 +133,3 @@ class user(horse, scoreTrack):
 
     def print_info(self):
         return "User: " + str(self.name)
-
