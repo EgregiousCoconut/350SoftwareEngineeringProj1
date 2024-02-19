@@ -21,17 +21,10 @@ class graphics():
         self.x = 100
         pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.x, 5, 10, self.height - 10))
         pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
-        self.font = pygame.font.Font(None, 36)
-
-    def display_text(self, text, position, color = (255, 255, 255)):
-        text_surface = self.font.render(text, True, color)
-        self.windowSurfaceObj.blit(text_surface, position)
-        pygame.display.update()
 
     def run(self):
         running = True
         while running:
-            self.windowSurfaceObj.fill(self.blackColor)
             for event in pygame.event.get():
                 if event.type == QUIT:
                     running = False
@@ -50,10 +43,6 @@ class graphics():
                 pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
                 pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.a, 5, 10, self.height - 10))
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
-
-                self.display_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490))
-                self.display_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490))
-                self.display_text(winner_text, (425, 250))
 
         pygame.quit()
         sys.exit()
@@ -200,8 +189,6 @@ if __name__ == "__main__":
                     print(f"{player2.name} has lost the game.")
                     break
 
-    game_graphics = graphics()
-
     p1_letters = len(player1.score_tracker.letters)
     p2_letters = len(player2.score_tracker.letters)
 
@@ -209,19 +196,12 @@ if __name__ == "__main__":
     print(player1.print_info())
     print(player2.print_info())
 
-    winner_text = ""
     if p1_letters < p2_letters:
         print(f"{player1.name} wins!")
-        winner_text = f"{player1.name} wins!"
     elif p2_letters < p1_letters:
         print(f"{player2.name} wins!")
-        winner_text = f"{player2.name} wins!"
     else:
         print("It's a draw!")
-        winner_text = "It's a draw!"
 
-    game_graphics.display_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490))
-    game_graphics.display_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490))
-    game_graphics.display_text(winner_text, (425, 250))
-
+    game_graphics = graphics()
     game_graphics.run()
