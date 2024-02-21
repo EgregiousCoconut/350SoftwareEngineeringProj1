@@ -30,6 +30,8 @@ class graphics():
         pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
 
         self.baskeballIMG = "img here"
+        self.backgroundIMG = "background here"
+        self.rimg = "img here"
 
     def draw_text(self, text, position, font_size=24, color = None):
         if color is None:
@@ -255,6 +257,4 @@ if __name__ == "__main__":
     game_graphics.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490))
     game_graphics.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490))
     game_graphics.draw_text(winner_text, (425, 250))
-
-    game_graphics = graphics()
     game_graphics.run()
