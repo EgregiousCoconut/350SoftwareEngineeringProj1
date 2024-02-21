@@ -22,12 +22,14 @@ class graphics():
         self.whiteColor = pygame.Color(255, 255, 255)
         self.greenColor = pygame.Color(0, 255, 0)
         self.blackColor = pygame.Color(0, 0, 0)
-        pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width / 4, self.a, self.width / 2, 10))
-        self.whiteColor = pygame.Color(255, 255, 255)
         self.a = 100
         self.b = 10
+        pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width / 4, self.a, self.width / 2, 10))
+        self.whiteColor = pygame.Color(255, 255, 255)
         pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.width / 4, self.a, self.width / 2, 10))
         pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
+
+        self.baskeballIMG = "img here"
 
     def draw_text(self, text, position, font_size=24, color = None):
         if color is None:
@@ -48,7 +50,7 @@ class graphics():
                         running = False
 
             self.button = pygame.mouse.get_pressed()
-            time.sleep(.03)
+            time.sleep(.01)
             self.a += self.b
             if self.a < 0:
                 self.a = 0
@@ -57,13 +59,16 @@ class graphics():
                 self.a = self.height
                 self.b *= -1
             pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
-            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, 50, self.width / 2, 200))
-            pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(5, self.a, self.width / 2, 10))
+            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, 50, self.width / 3, 200))
+            pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(5, self.a, self.width / 3, 10))
             pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
+            self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
+            self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
+            self.draw_text(winner_text, (425, 250), 35)
             if self.button[0] != 0:
                 pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
-                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, 50, self.width / 2, 200))
-                pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(5, self.a, self.width / 2, 10))
+                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, 50, self.width / 3, 200))
+                pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(5, self.a, self.width / 3, 10))
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
                 self.b = 0
                 self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
@@ -71,13 +76,19 @@ class graphics():
                 self.draw_text(winner_text, (425, 250), 35)
                 if self.a > 50 and self.a < 250:
                     print("True")
-                    return True
+                    self.shot_animation(True)
                 else:
                     print("False")
-                    return False
+                    self.shot_animation(False)
 
-        pygame.quit()
         sys.exit()
+
+
+    def shot_animation(self, made):
+        if made:
+            pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
+            pygame.draw.circle(self.basketballIMG, int(self.width / 2), [5, 5], 5, 10)
+
 
 
 '''
