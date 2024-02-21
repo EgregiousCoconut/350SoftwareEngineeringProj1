@@ -98,29 +98,6 @@ This class will hold and display the images of the basketball backgrounds when
 playing the game.
 '''
 
-
-class frames(graphics):
-    pass
-
-
-'''
-This class will calculate the shot probability using random class, will store the
-user input and use that to determine who shot the previous shot and how many shots
-have been made (total score for user so far).
-'''
-
-
-class horse():
-    pass
-
-
-
-'''
-This class will keep track of the user score for both users, and will have a function
-that adds a letter to the HORSE scoreboard based on if a shot was made for that user.
-'''
-
-
 class scoreTrack():
 
     def __init__(self, name):
@@ -187,24 +164,6 @@ the game.
 class UsernameMaxException(Exception):
     def __init__(self, message):
         super().__init__(message)
-
-class user(horse, scoreTrack):
-    def __init__(self, name):
-        self.__name = name  # name user inputs
-
-    @property
-    def name(self):
-        return self.__name
-
-    @name.setter
-    def name(self, name):
-        if len(name) > 20:
-            raise UsernameMaxException("Username is limited to 20 characters.")
-        self.__name = name
-
-    def print_info(self):
-        return "User: " + str(self.name)
-
 
 
 if __name__ == "__main__":
