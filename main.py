@@ -1,5 +1,6 @@
 import time
-
+import cv2
+import numpy as np
 import pygame, sys
 import os
 from pygame.locals import *
@@ -14,7 +15,7 @@ at certain point on the slider).
 class graphics():
     """had to adjust because it was running an infinite loop and I needed to test the scoring"""
     def __init__(self):
-        self.width = 960
+        self.width = 1260
         self.height = 540
         pygame.init()
         pygame.font.init()
@@ -24,14 +25,11 @@ class graphics():
         self.blackColor = pygame.Color(0, 0, 0)
         self.a = 100
         self.b = 10
-        pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width / 4, self.a, self.width / 2, 10))
-        self.whiteColor = pygame.Color(255, 255, 255)
-        pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.width / 4, self.a, self.width / 2, 10))
-        pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
-
-        self.baskeballIMG = "img here"
-        self.backgroundIMG = "background here"
-        self.rimg = "img here"
+        self.baskeballIMG = pygame.image.load('basketball.png').convert()
+        self.backgroundIMG = pygame.image.load('background-w-rim.png').convert()
+        self.rimg = pygame.image.load('basketball-rim.png').convert()
+        self.madeShot = cv2.VideoCapture("made.mp4")
+        self.missShot = cv2.VideoCapture("miss.mp4")
 
     def draw_text(self, text, position, font_size=24, color = None):
         if color is None:
@@ -60,17 +58,17 @@ class graphics():
             elif self.a > self.height:
                 self.a = self.height
                 self.b *= -1
-            pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
-            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, 50, self.width / 3, 200))
-            pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(5, self.a, self.width / 3, 10))
+            pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(960, 0, 300, self.height))
+            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 200))
+            pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(960, self.a, 300, 10))
             pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
             self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
             self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
             self.draw_text(winner_text, (425, 250), 35)
             if self.button[0] != 0:
                 pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
-                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(5, 50, self.width / 3, 200))
-                pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(5, self.a, self.width / 3, 10))
+                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 200))
+                pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(960, self.a, 300, 10))
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
                 self.b = 0
                 self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
@@ -79,6 +77,7 @@ class graphics():
                 if self.a > 50 and self.a < 250:
                     print("True")
                     self.shot_animation(True)
+
                 else:
                     print("False")
                     self.shot_animation(False)
@@ -87,10 +86,36 @@ class graphics():
 
 
     def shot_animation(self, made):
+        cv2.namedWindow("Video Player", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Video Player", 270, 480)
         if made:
-            pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
-            pygame.draw.circle(self.basketballIMG, int(self.width / 2), [5, 5], 5, 10)
 
+            # Read the entire file until it is completed
+            while self.madeShot.isOpened():
+                # Capture each frame
+                ret, frame = self.madeShot.read()
+                if ret:
+                    cv2.imshow('Video Player', frame)
+                    # Display the resulting frame
+                    if cv2.waitKey(25) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
+        else:
+            # Read the entire file until it is completed
+            while self.missShot.isOpened():
+                # Capture each frame
+                ret, frame = self.missShot.read()
+                if ret:
+                    cv2.imshow('Video Player', frame)
+                    # Display the resulting frame
+                    if cv2.waitKey(25) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
+        self.b = 10
+        cv2.destroyAllWindows()
+        return
 
 
 '''
