@@ -27,9 +27,11 @@ class graphics():
         self.b = 10
         self.baskeballIMG = pygame.image.load('basketball.png').convert()
         self.backgroundIMG = pygame.image.load('background-w-rim.png').convert()
+        self.backgroundIMGSmall = pygame.transform.scale(self.backgroundIMG, (960, 540))
         self.rimg = pygame.image.load('basketball-rim.png').convert()
         self.madeShot = cv2.VideoCapture("made.mp4")
         self.missShot = cv2.VideoCapture("miss.mp4")
+        self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0,0))
 
     def draw_text(self, text, position, font_size=24, color = None):
         if color is None:
@@ -67,6 +69,7 @@ class graphics():
             self.draw_text(winner_text, (425, 250), 35)
             if self.button[0] != 0:
                 pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
+                self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))
                 pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 200))
                 pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(960, self.a, 300, 10))
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
