@@ -35,7 +35,7 @@ class graphics():
 
     def draw_text(self, text, position, font_size=24, color = None):
         if color is None:
-            color = self.whiteColor
+            color = self.blackColor
         font = pygame.font.Font(None, font_size)  # Use the default font and specified size
         text_surface = font.render(text, True, color)  # Create a text surface
         self.windowSurfaceObj.blit(text_surface, position)  # Draw the text surface to the screen
@@ -61,28 +61,28 @@ class graphics():
                 self.a = self.height
                 self.b *= -1
             pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(960, 0, 300, self.height))
-            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 200))
+            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 75))
             pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(960, self.a, 300, 10))
             pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
             self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
             self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
-            self.draw_text(winner_text, (425, 250), 35)
             if self.button[0] != 0:
                 pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))
                 self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))
-                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 200))
+                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 75))
                 pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(960, self.a, 300, 10))
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
                 self.b = 0
                 self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
                 self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
-                self.draw_text(winner_text, (425, 250), 35)
                 if self.a > 50 and self.a < 250:
                     print("True")
+                    pygame.display.quit()
                     self.shot_animation(True)
 
                 else:
                     print("False")
+                    pygame.display.quit()
                     self.shot_animation(False)
 
         sys.exit()
@@ -117,8 +117,14 @@ class graphics():
                 else:
                     break
         self.b = 10
+        self.madeShot.release()
+        self.missShot.release()
+        self.madeShot = cv2.VideoCapture("made.mp4")
+        self.missShot = cv2.VideoCapture("miss.mp4")
         cv2.destroyAllWindows()
-        return
+        self.windowSurfaceObj = pygame.display.set_mode((self.width, self.height), 1, 16)
+        pygame.display.init()
+        self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))
 
 
 '''
@@ -200,7 +206,7 @@ if __name__ == "__main__":
     player1 = users("Alice")
     player2 = users("Bob")
 
-    shots_taken = [("Alice", True), ("Bob", False), ("Alice", False), ("Bob", True), ("Alice", False), ("Bob", False), ("Alice", False), ("Bob", False), ("Alice", False), ("Bob", False), ("Alice", True), ("Bob", False)]
+    shots_taken = []
 
     for player_name, shot_made in shots_taken:
         if player_name == player1.name:
@@ -222,6 +228,7 @@ if __name__ == "__main__":
                     break
 
     game_graphics = graphics()
+    game_graphics.run()
 
     p1_letters = len(player1.score_tracker.letters)
     p2_letters = len(player2.score_tracker.letters)
@@ -241,7 +248,4 @@ if __name__ == "__main__":
         print("It's a draw!")
         winner_text = "It's a Draw"
 
-    game_graphics.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490))
-    game_graphics.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490))
     game_graphics.draw_text(winner_text, (425, 250))
-    game_graphics.run()
