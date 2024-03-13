@@ -14,7 +14,7 @@ at certain point on the slider).
 
 class graphics():
     """had to adjust because it was running an infinite loop and I needed to test the scoring"""
-    def __init__(self):
+    def __init__(self, user1, user2):
         self.width = 1260
         self.height = 540
         pygame.init()
@@ -32,6 +32,9 @@ class graphics():
         self.madeShot = cv2.VideoCapture("made.mp4")
         self.missShot = cv2.VideoCapture("miss.mp4")
         self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0,0))
+        self.user1 = user1
+        self.user2 = user2
+        self.current_user = self.user1
 
     def draw_text(self, text, position, font_size=24, color = None):
         if color is None:
@@ -75,11 +78,10 @@ class graphics():
                 self.b = 0
                 self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
                 self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
-                if self.a > 50 and self.a < 250:
+                if self.a > 50 and self.a < 125:
                     print("True")
                     pygame.display.quit()
                     self.shot_animation(True)
-
                 else:
                     print("False")
                     pygame.display.quit()
@@ -92,7 +94,6 @@ class graphics():
         cv2.namedWindow("Video Player", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Video Player", 270, 480)
         if made:
-
             # Read the entire file until it is completed
             while self.madeShot.isOpened():
                 # Capture each frame
@@ -101,8 +102,12 @@ class graphics():
                     cv2.imshow('Video Player', frame)
                     # Display the resulting frame
                     if cv2.waitKey(25) & 0xFF == ord('q'):
+                        if self.current_user.add_letter():
+                            sys.exit()
                         break
                 else:
+                    if self.current_user.add_letter():
+                        sys.exit()
                     break
         else:
             # Read the entire file until it is completed
@@ -125,6 +130,10 @@ class graphics():
         self.windowSurfaceObj = pygame.display.set_mode((self.width, self.height), 1, 16)
         pygame.display.init()
         self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))
+        if self.current_user == self.user1:
+            self.current_user = self.user2
+        else:
+            self.current_user = self.user1
 
 
 '''
@@ -138,15 +147,15 @@ class scoreTrack():
         self.__letters = ""  # Stores letters for horse
         self.__name = name  # used to return name of who wins
 
-    def add_letter(self, letter):
-        self.__letters += letter
+    def add_letter(self):
+        self.__letters += "HORSE"[len(self.__letters)]
         if self.checkCondition():
             return True
         return False
 
     def checkCondition(self):
         """check if player spelled horse"""
-        return self.__letters.startswith("HORSE")
+        return self.__letters == "HORSE"
 
     @property
     def letters(self):
@@ -180,9 +189,9 @@ class users:
     def print_info(self):
         return f"{str(self.name)} spelled: {self.score_tracker.letters}"
 
-    def add_letter(self, letter):
+    def add_letter(self):
         """Add letter to players score and check if lost"""
-        lost = self.score_tracker.add_letter(letter)
+        lost = self.score_tracker.add_letter()
         if lost:
             print(f"{self.__name} has spelled HORSE and lost the game!")
             return True
@@ -207,27 +216,7 @@ if __name__ == "__main__":
     player2 = users("Bob")
 
     shots_taken = []
-
-    for player_name, shot_made in shots_taken:
-        if player_name == player1.name:
-            if not shot_made:
-                letter = "HORSE"[len(player1.score_tracker.letters)]
-                lost = player1.add_letter(letter)
-                print(player1.print_info())
-                if lost:
-                    print(f"{player1.name} has lost the game.")
-                    break
-
-        elif player_name == player2.name:
-            if not shot_made:
-                letter = "HORSE"[len(player2.score_tracker.letters)]
-                lost = player2.add_letter(letter)
-                print(player2.print_info())
-                if lost:
-                    print(f"{player2.name} has lost the game.")
-                    break
-
-    game_graphics = graphics()
+    game_graphics = graphics(player1, player2)
     game_graphics.run()
 
     p1_letters = len(player1.score_tracker.letters)
