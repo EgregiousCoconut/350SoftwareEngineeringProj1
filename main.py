@@ -3,6 +3,7 @@ import cv2
 import pygame
 import sys
 from pygame.locals import *
+import wx
 
 '''
 The class that will hold our data  for our graphics, including: title screen,
@@ -15,8 +16,8 @@ class graphics:
     """had to adjust because it was running an infinite loop and I needed to test the scoring"""
 
     def __init__(self, user1, user2):
-        self.width = 1260
-        self.height = 540
+        app = wx.App(False)
+        self.width, self.height = wx.GetDisplaySize()
         pygame.init()  # initialize game
         pygame.font.init()
         self.windowSurfaceObj = pygame.display.set_mode((self.width, self.height), 1, 16)  # initialize game window
@@ -24,10 +25,10 @@ class graphics:
         self.greenColor = pygame.Color(0, 255, 0)
         self.blackColor = pygame.Color(0, 0, 0)
         self.a = 100  # variable for storing height of the slider
-        self.b = 10  # variable for storing velocity of the slider
+        self.b = 20  # variable for storing velocity of the slider
         self.baskeballIMG = pygame.image.load('basketball.png').convert()  # initialize images
         self.backgroundIMG = pygame.image.load('background-w-rim.png').convert()
-        self.backgroundIMGSmall = pygame.transform.scale(self.backgroundIMG, (960, 540))  # scale loaded image
+        self.backgroundIMGSmall = pygame.transform.scale(self.backgroundIMG, (self.width * .8, self.height))  # scale loaded image
         self.rimg = pygame.image.load('basketball-rim.png').convert()
         self.madeShot = cv2.VideoCapture("made.mp4")  # initialize videos
         self.missShot = cv2.VideoCapture("miss.mp4")
@@ -64,20 +65,17 @@ class graphics:
             elif self.a > self.height:
                 self.a = self.height
                 self.b *= -1
-            pygame.draw.rect(self.windowSurfaceObj, self.blackColor,
-                             Rect(960, 0, 300, self.height))  # update slider graphics
-            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 75))
-            pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(960, self.a, 300, 10))
+            pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(self.width * .8, 0, self.width * .2, self.height))  # update slider graphics
+            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.width * .8, 50, self.width * .2, 75))
+            pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width * .8, self.a, self.width * .2, 10))
             pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
-            self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490),
-                           35)  # update scoring text
+            self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490),35)  # update scoring text
             self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
             if self.button[0] != 0:  # if mouse click is detected, run this
-                pygame.draw.rect(self.windowSurfaceObj, self.blackColor,
-                                 Rect(0, 0, self.width, self.height))  # clear background
+                pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))  # clear background
                 self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))
-                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(960, 50, 300, 75))
-                pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(960, self.a, 300, 10))
+                pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.width * .8, 50, self.width * .2, 75))
+                pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width * .8, self.a, self.width * .2, 10))
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
                 self.b = 0  # set velocity to 0
                 self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
@@ -94,8 +92,8 @@ class graphics:
         sys.exit()  # when loop ends, close windows associated
 
     def shot_animation(self, made):
-        cv2.namedWindow("Video Player", cv2.WINDOW_NORMAL)  # initialize video window
-        cv2.resizeWindow("Video Player", 270, 480)
+        cv2.namedWindow("Video Player", cv2.WND_PROP_FULLSCREEN)  # initialize video window
+        cv2.setWindowProperty("Video Player", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
         if self.current_user == self.user1:  # change user, doing so before points because the user who didn't shoot would get points
             self.current_user = self.user2
         else:
@@ -128,7 +126,7 @@ class graphics:
                         break
                 else:
                     break
-        self.b = 10
+        self.b = 20
         self.madeShot.release()  # release videos, had to do this because of errors
         self.missShot.release()
         self.madeShot = cv2.VideoCapture("made.mp4")  # reinitialize videos
@@ -218,8 +216,8 @@ class UsernameMaxException(Exception):
 if __name__ == "__main__":
     print("Testing block is executing")  # debug
 
-    player1 = users("Alice")  # predetermined users for first iteration
-    player2 = users("Bob")
+    player1 = users(str(input("Enter Player 1's name: ")))  # predetermined users for first iteration
+    player2 = users(str(input("Enter Player 2's name: ")))
 
     shots_taken = []
     game_graphics = graphics(player1, player2)  # initialize graphics with users
