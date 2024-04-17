@@ -12,7 +12,7 @@ at certain point on the slider).
 '''
 
 
-class graphics:
+class Graphics:
     """had to adjust because it was running an infinite loop and I needed to test the scoring"""
 
     def __init__(self, user1, user2):
@@ -71,7 +71,7 @@ class graphics:
             pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width * .8, self.a, self.width * .2, 10))
             pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
             self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490),35)  # update scoring text
-            self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
+            self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (1000, 490), 35)
             if self.button[0] != 0:  # if mouse click is detected, run this
                 pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))  # clear background
                 self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))
@@ -80,7 +80,7 @@ class graphics:
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
                 self.b = 0  # set velocity to 0
                 self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
-                self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (680, 490), 35)
+                self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (1000, 490), 35)
                 if 50 < self.a < 125:  # condition if slider is within scoring parameters
                     print("True")  # debug
                     pygame.display.quit()  # close pygame window
@@ -189,7 +189,7 @@ class scoreTrack:
         return f"{self.__name} has the letters: {self.__letters}"
 
 
-class users:
+class User:
     def __init__(self, name):
         self.__name = name  # name user inputs
         self.score_tracker = scoreTrack(name)  # initializes score tracker
@@ -212,7 +212,7 @@ class users:
         """Add letter to players score and check if lost"""
         lost = self.score_tracker.add_letter()
         if lost:
-            print(f"{self.__name} has spelled HORSE and lost the game!")
+            print(f"{self.__name} has spelled HORSE and won the game!")
             return True
         return False
 
@@ -231,11 +231,11 @@ class UsernameMaxException(Exception):
 if __name__ == "__main__":
     print("Testing block is executing")  # debug
 
-    player1 = users(str(input("Enter Player 1's name: ")))  # predetermined users for first iteration
-    player2 = users(str(input("Enter Player 2's name: ")))
+    player1 = User(str(input("Enter Player 1's name: ")))  # predetermined users for first iteration
+    player2 = User(str(input("Enter Player 2's name: ")))
 
     shots_taken = []
-    game_graphics = graphics(player1, player2)  # initialize graphics with users
+    game_graphics = Graphics(player1, player2)  # initialize graphics with users
     game_graphics.run()  # run main graphics
 
     p1_letters = len(player1.score_tracker.letters)
