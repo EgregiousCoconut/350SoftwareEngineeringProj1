@@ -26,7 +26,7 @@ class graphics:
         self.blackColor = pygame.Color(0, 0, 0)
         self.a = 100  # variable for storing height of the slider
         self.b = 20  # variable for storing velocity of the slider
-        self.baskeballIMG = pygame.image.load('basketball.png').convert()  # initialize images
+        self.basketballIMG = pygame.image.load('basketball.png').convert()  # initialize images
         self.backgroundIMG = pygame.image.load('background-w-rim.png').convert()
         self.backgroundIMGSmall = pygame.transform.scale(self.backgroundIMG, (self.width * .8, self.height))  # scale loaded image
         self.rimg = pygame.image.load('basketball-rim.png').convert()
@@ -36,6 +36,7 @@ class graphics:
         self.user1 = user1  # initialize users passed into it
         self.user2 = user2
         self.current_user = self.user1  # set current user
+        self.previousShot = 0
 
     def draw_text(self, text, position, font_size=24, color=None):
         if color is None:
@@ -94,10 +95,6 @@ class graphics:
     def shot_animation(self, made):
         cv2.namedWindow("Video Player", cv2.WND_PROP_FULLSCREEN)  # initialize video window
         cv2.setWindowProperty("Video Player", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-        if self.current_user == self.user1:  # change user, doing so before points because the user who didn't shoot would get points
-            self.current_user = self.user2
-        else:
-            self.current_user = self.user1
         if made:  # conditional if shot was made
             # Read the entire file until it is completed
             while self.madeShot.isOpened():
@@ -108,10 +105,18 @@ class graphics:
                     # Display the resulting frame
                     if cv2.waitKey(25) & 0xFF == ord('q'):
                         if self.current_user.add_letter():  # add letter to other user
+                            if self.previousShot == 0:
+                                self.previousShot = 1
+                            else:
+                                self.previousShot = 0
                             sys.exit()
                         break
                 else:
                     if self.current_user.add_letter():  # add letter to other user
+                        if self.previousShot == 0:
+                            self.previousShot = 1
+                        else:
+                            self.previousShot = 0
                         sys.exit()
                     break
         else:
@@ -123,10 +128,20 @@ class graphics:
                     cv2.imshow('Video Player', frame)
                     # Display the resulting frame
                     if cv2.waitKey(25) & 0xFF == ord('q'):
+                        if self.previousShot == 1:
+                            if self.current_user.add_letter():  # add letter to other user
+                                sys.exit()
                         break
                 else:
+                    if self.previousShot == 1:
+                        if self.current_user.add_letter():  # add letter to other user
+                            sys.exit()
                     break
         self.b = 20
+        if self.current_user == self.user1:
+            self.current_user = self.user2
+        else:
+            self.current_user = self.user1
         self.madeShot.release()  # release videos, had to do this because of errors
         self.missShot.release()
         self.madeShot = cv2.VideoCapture("made.mp4")  # reinitialize videos
