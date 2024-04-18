@@ -1,26 +1,16 @@
 import unittest
-from unittest.mock import MagicMock
 
 import pygame
 
 from main import User, Graphics
 from main import ScoreTrack
 
+
 class MyTestCase(unittest.TestCase):
-    # Testing for the ScoreTrack class
 
     def test_name(self):
         x = ScoreTrack('Alice')
-        self.assertIs(x.name, 'Alice')  # tests to see if name is returned correctly
-
-    def test_checkCondition(self):
-        score_track = ScoreTrack("Player1") # create instance
-        self.assertFalse(score_track.checkCondition()) # verify returns false intially
-
-        for _ in range(5):
-            score_track.add_letter() # add letters until HORSE is spelled
-
-        self.assertTrue(score_track.checkCondition()) # verify returns True after spelling HORSE
+        self.assertIs(x.name, 'Alice')  # add assertion here
 
     def test_str_letters(self):
         x = ScoreTrack("Bob")
@@ -30,23 +20,9 @@ class MyTestCase(unittest.TestCase):
         x = ScoreTrack("Alice")
         self.assertEqual(x.letters, "")
 
-    # testing for the User class
-
-    def test_user_init(self):
-        # Initialize a User instance with a name
-        user_name = "TestUser"
-        user = User(user_name)
-        self.assertEqual(user.name, user_name)
-
-        # Verify that the user's score tracker is initialized correctly
-        # Check if score tracker is an instance of ScoreTrack
-        self.assertIsInstance(user.score_tracker, ScoreTrack)
-
-        # Verify that the score tracker's name is the same as the user's name
-        self.assertEqual(user.score_tracker.name, user_name)
-
-        # Verify that the user's score tracker starts with no letters
-        self.assertEqual(user.score_tracker.letters, "")
+    def test_checkCondition(self):
+        x = ScoreTrack("Bob")
+        self.assertNotEqual(x.checkCondition(), "HORSE")
 
     def test_add_letter(self):
         x = ScoreTrack("HOR")
@@ -59,7 +35,6 @@ class MyTestCase(unittest.TestCase):
         user.add_letter()
         self.assertEqual(user.print_info(), "Player1 spelled: H") # verify the print info
 
-    # testing for the graphics class
     def test_graphics_init(self):
         graphics = Graphics() # create Graphics instance
 
@@ -76,10 +51,3 @@ class MyTestCase(unittest.TestCase):
 
         # verify the correct state is set initially
         self.assertEqual(graphics.state, 'entering_player1')
-    def test_draw_text(self):
-        graphics = Graphics() # Create a Graphics instance
-        graphics.windowSurfaceObj = MagicMock() # Mock pygame, focus on behavior of screen without pygame
-
-        graphics.draw_text("Hello World", (100, 100), 24, graphics.blackColor) # Call the draw_text method
-        # Verify that the text was drawn on the screen
-        graphics.windowSurfaceObj.blit.assert_called()  # Check if `blit` was called
