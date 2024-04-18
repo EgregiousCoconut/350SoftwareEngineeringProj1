@@ -33,13 +33,10 @@ class Graphics:
         self.madeShot = cv2.VideoCapture("made.mp4")  # initialize videos
         self.missShot = cv2.VideoCapture("miss.mp4")
         self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))  # set background
-
-        self.state = 'entering_player1'
-        self.player1 = ''
-        self.player2 = ''
-
-        self.user1 = self.player1  # initialize users
-        self.user2 = self.player2
+        self.player = 1
+        self.user1 = User(self.create_user())
+        self.player = 2
+        self.user2 = User(self.create_user())
         self.current_user = self.user1  # set current user
         self.previousShot = 0
 
@@ -51,7 +48,7 @@ class Graphics:
         self.windowSurfaceObj.blit(text_surface, position)  # Draw the text surface to the screen
         pygame.display.update()
 
-    def run(self):
+    def create_user(self):
         self.text = ""
         text = ""
         running = True  # loop to run forever until conditions are met
@@ -70,75 +67,78 @@ class Graphics:
                         # Add the character to text
                         text += event.unicode
 
-            self.windowSurfaceObj.fill(self.whiteColor)
-
-            # Manage the game state
-            if self.state == 'entering_player1':
-                self.draw_text("What is your name, Player 1?", (600, 400), 50, self.blackColor)
+                self.windowSurfaceObj.fill(self.whiteColor)
+                # Manage the game state
+                self.draw_text("What is your name, player " + str(self.player) + "?", (600, 400), 50, self.blackColor)
                 if event.type == KEYDOWN:
                     if event.unicode:
                         text += self.text
                 # Check if the player pressed Enter
                 if event.type == KEYDOWN and event.key == K_RETURN:
-                    self.player1 = self.text
-                    self.draw_text(text, (10, 50), 30, self.blackColor)
-                    self.user1 = self.player1
-                    self.text = ""
-                    self.state = 'entering_player2'
+                    return self.text
 
-                pygame.display.update()
+    def run(self):
+        app = wx.App(False)
+        self.width, self.height = wx.GetDisplaySize()
+        pygame.init()  # initialize game
+        pygame.font.init()
+        self.windowSurfaceObj = pygame.display.set_mode((self.width, self.height), 1,
+                                                        16)  # initialize game window
+        self.whiteColor = pygame.Color(255, 255, 255)  # initialize colors
+        self.greenColor = pygame.Color(0, 255, 0)
+        self.blackColor = pygame.Color(0, 0, 0)
+        self.a = 100  # variable for storing height of the slider
+        self.b = 20  # variable for storing velocity of the slider
+        self.basketballIMG = pygame.image.load('basketball.png').convert()  # initialize images
+        self.backgroundIMG = pygame.image.load('background-w-rim.png').convert()
+        self.backgroundIMGSmall = pygame.transform.scale(self.backgroundIMG,
+                                                         (self.width * .8, self.height))  # scale loaded image
+        self.rimg = pygame.image.load('basketball-rim.png').convert()
+        self.madeShot = cv2.VideoCapture("made.mp4")  # initialize videos
+        self.missShot = cv2.VideoCapture("miss.mp4")
+        self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))  # set background
+        running = True  # loop to run forever until conditions are met
+        while running:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    running = False
+                elif event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        running = False
 
-            if self.state == 'entering_player2':
-                self.draw_text("What is your name, Player 2?", (600, 400), 50, self.blackColor)
-                if event.type == KEYDOWN:
-                    if event.unicode:
-                        text += self.text
-                # Check if the player pressed Enter
-                if event.type == KEYDOWN and event.key == K_RETURN:
-                    self.player1 = self.text
-                    self.draw_text(text, (10, 50), 30, self.blackColor)
-                    self.user1 = self.player1
-                    self.text = ""
-                    self.state = 'main_game'
-
-                pygame.display.update()
-
-            elif self.state == 'main_game':
-                # run main game
-
-                self.button = pygame.mouse.get_pressed()
-                time.sleep(
-                    .01)  # slow the rate of the slider to make it uniform, otherwise speed varies on code execution speed
-                self.a += self.b  # add velocity to height of slider
-                if self.a < 0:  # conditions if slider is at top or bottom, reverse velocity
-                    self.a = 0
-                    self.b *= -1
-                elif self.a > self.height:
-                    self.a = self.height
-                    self.b *= -1
-                pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(self.width * .8, 0, self.width * .2, self.height))  # update slider graphics
+            self.button = pygame.mouse.get_pressed()
+            time.sleep(
+                .01)  # slow the rate of the slider to make it uniform, otherwise speed varies on code execution speed
+            self.a += self.b  # add velocity to height of slider
+            if self.a < 0:  # conditions if slider is at top or bottom, reverse velocity
+                self.a = 0
+                self.b *= -1
+            elif self.a > self.height:
+                self.a = self.height
+                self.b *= -1
+            pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(self.width * .8, 0, self.width * .2, self.height))  # update slider graphics
+            pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.width * .8, 50, self.width * .2, 75))
+            pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width * .8, self.a, self.width * .2, 10))
+            pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
+            self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490),35)  # update scoring text
+            self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (1000, 490), 35)
+            if self.button[0] != 0:  # if mouse click is detected, run this
+                pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))  # clear background
+                self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))
                 pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.width * .8, 50, self.width * .2, 75))
                 pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width * .8, self.a, self.width * .2, 10))
                 pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
-                self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490),35)  # update scoring text
+                self.b = 0  # set velocity to 0
+                self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
                 self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (1000, 490), 35)
-                if self.button[0] != 0:  # if mouse click is detected, run this
-                    pygame.draw.rect(self.windowSurfaceObj, self.blackColor, Rect(0, 0, self.width, self.height))  # clear background
-                    self.windowSurfaceObj.blit(self.backgroundIMGSmall, (0, 0))
-                    pygame.draw.rect(self.windowSurfaceObj, self.greenColor, Rect(self.width * .8, 50, self.width * .2, 75))
-                    pygame.draw.rect(self.windowSurfaceObj, self.whiteColor, Rect(self.width * .8, self.a, self.width * .2, 10))
-                    pygame.display.update(pygame.Rect(0, 0, self.width, self.height))
-                    self.b = 0  # set velocity to 0
-                    self.draw_text(f"{player1.name} spelled: {player1.score_tracker.letters}", (35, 490), 35)
-                    self.draw_text(f"{player2.name} spelled: {player2.score_tracker.letters}", (1000, 490), 35)
-                    if 50 < self.a < 125:  # condition if slider is within scoring parameters
-                        print("True")  # debug
-                        pygame.display.quit()  # close pygame window
-                        self.shot_animation(True)
-                    else:
-                        print("False")
-                        pygame.display.quit()
-                        self.shot_animation(False)
+                if 50 < self.a < 125:  # condition if slider is within scoring parameters
+                    print("True")  # debug
+                    pygame.display.quit()  # close pygame window
+                    self.shot_animation(True)
+                else:
+                    print("False")
+                    pygame.display.quit()
+                    self.shot_animation(False)
 
         sys.exit()  # when loop ends, close windows associated
 
