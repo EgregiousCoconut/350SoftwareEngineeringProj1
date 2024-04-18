@@ -6,7 +6,7 @@ from main import User, Graphics
 from main import ScoreTrack
 
 
-class MyTestCase(unittest.TestCase):
+class MyTestCase(unittest.TestCase): #
 
     def test_name(self):
         x = ScoreTrack('Alice')
