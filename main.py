@@ -4,7 +4,7 @@ import pygame
 import sys
 from pygame.locals import *
 import wx
-s
+
 
 class Graphics:
     """
@@ -99,18 +99,18 @@ class Graphics:
                     elif event.unicode:
                         text += event.unicode
 
-                # Display name input prompt
-                self.windowSurfaceObj.fill(self.whiteColor)
-                self.draw_text("What is your name, player " + str(self.player) + "?", (600, 400), 50, self.blackColor)
+            # Display name input prompt
+            self.windowSurfaceObj.fill(self.whiteColor)
+            self.draw_text("What is your name, player " + str(self.player) + "?", (600, 400), 50, self.blackColor)
 
-                # Capture keyboard input
-                if event.type == KEYDOWN:
-                    if event.unicode:
-                        text += self.text
+            # Capture keyboard input
+            if event.type == KEYDOWN:
+                if event.unicode:
+                    text += self.text
 
-                # Check if Enter key is pressed to submit the name
-                if event.type == KEYDOWN and event.key == K_RETURN:
-                    return self.text
+            # Check if Enter key is pressed to submit the name
+            if event.type == KEYDOWN and event.key == K_RETURN:
+                return self.text
 
     def run(self):
         """
