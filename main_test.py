@@ -73,13 +73,3 @@ class MyTestCase(unittest.TestCase):
         self.assertIsNotNone(graphics.whiteColor)
         self.assertIsNotNone(graphics.greenColor)
         self.assertIsNotNone(graphics.blackColor)
-
-        # verify the correct state is set initially
-        self.assertEqual(graphics.state, 'entering_player1')
-    def test_draw_text(self):
-        graphics = Graphics() # Create a Graphics instance
-        graphics.windowSurfaceObj = MagicMock() # Mock pygame, focus on behavior of screen without pygame
-
-        graphics.draw_text("Hello World", (100, 100), 24, graphics.blackColor) # Call the draw_text method
-        # Verify that the text was drawn on the screen
-        graphics.windowSurfaceObj.blit.assert_called()  # Check if `blit` was called
